@@ -28,9 +28,11 @@ else
 fi
 
 # test executable so we can use xorrisofs, mkisofs, or genisoimage as appropriate
-TOOL=xorrisofs
-if command -v xorrisofs &> /dev/null; then
-	echo "Using xorrisofs ..."
+EXTRA=""
+TOOL=xorriso
+if command -v xorriso &> /dev/null; then
+	echo "Using xorriso ..."
+	EXTRA=" -as mkisofs "
 elif command -v mkisofs &> /dev/null; then
 	TOOL=mkisofs
 	echo "xorrisofs not available; using mkisofs ..."
@@ -42,7 +44,7 @@ else
 	exit 1
 fi
 
-"$TOOL" -output $FILENAME -volid cidata -joliet -rock user-data meta-data 2>build.log
+"$TOOL" $EXTRA -output $FILENAME -volid cidata -joliet -rock user-data meta-data 2>build.log
 
 FILESIZE=0
 if [[ "$(uname)" == "Darwin" || "$(uname)" == "FreeBSD" ]]; then
