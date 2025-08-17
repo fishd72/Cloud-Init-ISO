@@ -40,6 +40,23 @@ write_files:
   path: /etc/issue
   permissions: '0644'
 
-power_state:
-  delay: 30
-  mode: reboot
+runcmd:
+  - |
+    # Get the OS ID from /etc/os-release
+    OS_ID=$(grep -E "^ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
+    
+    # Generate 6 random characters (alphanumeric)
+    RANDOM_SUFFIX=$(openssl rand -hex 3)
+    
+    # Create the new hostname
+    NEW_HOSTNAME="${OS_ID}-${RANDOM_SUFFIX}"
+    
+    # Set the hostname
+    hostnamectl set-hostname "$NEW_HOSTNAME"
+    
+    # Update /etc/hostname file
+    echo "$NEW_HOSTNAME" > /etc/hostname
+    
+    # Optional: Add to /etc/hosts for local resolution
+    sed -i "s/127.0.0.1.*$/127.0.0.1 localhost.localdomain $NEW_HOSTNAME/" /etc/hosts
+    
